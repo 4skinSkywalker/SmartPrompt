@@ -172,9 +172,9 @@ SmartPrompt.prototype.getBoilerPlate = function () {
         color: ${this.textColor};
         background-image: linear-gradient(
           230deg,
-          #a4c5,
-          #47c5,
-          #4cc5
+          #a4c8,
+          #47c8,
+          #4cc8
         );
         background-size: 300% 300%;
         opacity: 0;
@@ -202,8 +202,8 @@ SmartPrompt.prototype.getBoilerPlate = function () {
         overflow: auto;
         background-color: ${this.groundColor};
         border-radius: 1rem;
-        box-shadow:  10px 10px 80px #a4c6,
-                     -10px -10px 80px #4cc6;
+        box-shadow:  10px 10px 80px #a4c9,
+                     -10px -10px 80px #4cc9;
         opacity: 0;
         transition: all .3s ease;
       }
