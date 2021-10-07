@@ -1,13 +1,14 @@
 function SmartPrompt(opts) {
     this.uuid = Math.random().toString(36).slice(2); // Yes, this is a valid UUID...
 
-    this.title = opts.title;
-    this.prescription = opts.prescription;
-    this.postscription = opts.postscription;
+    this.title = opts.title || "";
+    this.prescription = opts.prescription || "";
+    this.postscription = opts.postscription || "";
     this.template = opts.template;
 
     this.figureColor = opts.figureColor || "#111";
     this.groundColor = opts.groundColor || "#fffff1";
+    this.textColor = opts.textColor || "#111";
 
     if (!this.isValidTemplate(this.template)) {
         throw new Error(`Template provided is invalid. The syntax is invalid, or it's a missing a name on an input or required is not specified as required="true"`);
@@ -168,6 +169,7 @@ SmartPrompt.prototype.getBoilerPlate = function () {
         display: grid;
         justify-items: center;
         align-items: center;
+        color: ${this.textColor};
         background-image: linear-gradient(
           230deg,
           #a4c5,
