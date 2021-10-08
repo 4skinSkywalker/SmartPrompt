@@ -1,10 +1,14 @@
-function SmartPrompt(opts) {
+function SmartPrompt(opts = {}) {
     this.uuid = Math.random().toString(36).slice(2); // Yes, this is a valid UUID...
 
     this.title = opts.title || "";
     this.prescription = opts.prescription || "";
     this.postscription = opts.postscription || "";
     this.template = opts.template;
+
+    if (!this.template) {
+      throw new Error("You must provide a valid template.");
+    }
 
     this.figureColor = opts.figureColor || "#111";
     this.groundColor = opts.groundColor || "#fffff1";
@@ -113,7 +117,7 @@ SmartPrompt.prototype.getBoilerPlate = function () {
       }
   
       .modal-wrapper${this.uuid} ::-webkit-scrollbar-track {
-        background: ${this.groundColor};
+        background-color: ${this.groundColor};
         background-image: linear-gradient(
           90deg,
           #ddd,
