@@ -15,9 +15,15 @@ The promp is able to:
 - Have overflow scroll if there is too much content
 - Two buttons, one to confirm and on to dismiss
 
+## Install
+
+`npm i smartprompt`
+
 ## Getting started
 
 ```js
+let SmartPrompt = require("smartprompt");
+
 let prompt = await new SmartPrompt(
   {
     figureColor: "#bada55",
