@@ -1,8 +1,6 @@
 # SmartPrompt
 
-A neat dialog prompter to get inputs from the user
-
-![SmartPrompt in action](demo.gif "SmartPrompt in action")
+A neat dialog prompter to get inputs from the user.
 
 ## What I wanted to achieve
 
