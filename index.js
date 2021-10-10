@@ -1,112 +1,112 @@
 function SmartPrompt(opts = {}) {
-    this.uuid = Math.random().toString(36).slice(2); // Yes, this is a valid UUID...
+  this.uuid = Math.random().toString(36).slice(2); // Yes, this is a valid UUID...
 
-    this.title = opts.title || "";
-    this.prescription = opts.prescription || "";
-    this.postscription = opts.postscription || "";
-    this.template = opts.template;
+  this.title = opts.title || "";
+  this.prescription = opts.prescription || "";
+  this.postscription = opts.postscription || "";
+  this.template = opts.template;
 
-    if (!this.template) {
-      throw new Error("You must provide a valid template.");
-    }
+  if (!this.template) {
+    throw new Error("You must provide a valid template.");
+  }
 
-    this.figureColor = opts.figureColor || "#111";
-    this.groundColor = opts.groundColor || "#fffff1";
-    this.textColor = opts.textColor || "#111";
+  this.figureColor = opts.figureColor || "#111";
+  this.groundColor = opts.groundColor || "#fffff1";
+  this.textColor = opts.textColor || "#111";
 
-    if (!this.isValidTemplate(this.template)) {
-        throw new Error(`Template provided is invalid. The syntax is invalid, or it's a missing a name on an input or required is not specified as required="true"`);
-    }
+  if (!this.isValidTemplate(this.template)) {
+    throw new Error(`Template provided is invalid. The syntax is invalid, or it's a missing a name on an input or required is not specified as required="true"`);
+  }
 
-    // Return a promise and extract resolve and reject
-    return new Promise((res, rej) => {
+  // Return a promise and extract resolve and reject
+  return new Promise((res, rej) => {
 
-        // Open the modal
-        let el = document.createElement("DIV");
-        el.innerHTML = this.getBoilerPlate();
+    // Open the modal
+    let el = document.createElement("DIV");
+    el.innerHTML = this.getBoilerPlate();
 
-        // Setup so that clicking outside dismisses the dialog
-        el.firstElementChild.addEventListener("click", (e) => {
-            if (e.target.classList[0] === ("modal-wrapper" + this.uuid)) {
-                this.cancel();
-            }
-        });
-
-        document.body.appendChild(el.firstElementChild);
-
-        this.fade(1);
-
-        window["prompt" + this.uuid] = this; // "this" is SmartPrompt
-
-        this.resolve = res;
-        this.reject = rej;
+    // Setup so that clicking outside dismisses the dialog
+    el.firstElementChild.addEventListener("click", (e) => {
+      if (e.target.classList[0] === ("modal-wrapper" + this.uuid)) {
+        this.cancel();
+      }
     });
+
+    document.body.appendChild(el.firstElementChild);
+
+    this.fade(1);
+
+    window["prompt" + this.uuid] = this; // "this" is SmartPrompt
+
+    this.resolve = res;
+    this.reject = rej;
+  });
 }
 
 SmartPrompt.prototype.fade = function (value, callback = () => { }) {
-    let modalWrapper = document.querySelector(".modal-wrapper" + this.uuid);
-    let modalContent = modalWrapper.querySelector(".modal-content");
-    modalContent.style.opacity = value;
-    setTimeout(() => {
-        modalWrapper.style.opacity = value;
-        callback();
-    }, 300);
+  let modalWrapper = document.querySelector(".modal-wrapper" + this.uuid);
+  let modalContent = modalWrapper.querySelector(".modal-content");
+  modalContent.style.opacity = value;
+  setTimeout(() => {
+    modalWrapper.style.opacity = value;
+    callback();
+  }, 300);
 };
 
 SmartPrompt.prototype.getForm = function () {
-    let modalWrapper = document.querySelector(".modal-wrapper" + this.uuid);
-    return modalWrapper.querySelector("form");
+  let modalWrapper = document.querySelector(".modal-wrapper" + this.uuid);
+  return modalWrapper.querySelector("form");
 }
 
 SmartPrompt.prototype.parseResult = function () {
-    let formData = new FormData(this.getForm());
-    return [...formData.entries()]
-        .reduce((result, tuple) => (result[tuple[0]] = tuple[1], result), {});
+  let formData = new FormData(this.getForm());
+  return [...formData.entries()]
+    .reduce((result, tuple) => (result[tuple[0]] = tuple[1], result), {});
 };
 
 SmartPrompt.prototype.removeModal = function () {
-    this.fade(0, () => {
-        document.body.removeChild(document.querySelector(".modal-wrapper" + this.uuid));
-    });
+  this.fade(0, () => {
+    document.body.removeChild(document.querySelector(".modal-wrapper" + this.uuid));
+  });
 
-    delete window["prompt" + this.uuid];
+  delete window["prompt" + this.uuid];
 };
 
 // I check the validity of the HTML provided and if all inputs have a name
 SmartPrompt.prototype.isValidTemplate = function (template) {
-    let doc = document.createElement("DIV");
-    doc.innerHTML = template;
-    if (doc.innerHTML !== template) { // Look strange, huh? Hehe
-        return false;
-    }
-    let inputs = [
-        ...doc.querySelectorAll("input"),
-        ...doc.querySelectorAll("select")
-    ];
-    return inputs.every(input => input.getAttribute("name"));
+  let doc = document.createElement("DIV");
+  doc.innerHTML = template;
+  if (doc.innerHTML !== template) { // Look strange, huh? Hehe
+    return false;
+  }
+  let inputs = [
+    ...doc.querySelectorAll("input"),
+    ...doc.querySelectorAll("select")
+  ];
+  return inputs.every(input => input.getAttribute("name"));
 };
 
 SmartPrompt.prototype.submit = function () {
-    if (this.getForm().checkValidity()) {
-        this.resolve(this.parseResult());
-        this.removeModal();
-    } else {
-        let modalWrapper = document.querySelector(".modal-wrapper" + this.uuid);
-        let modalContent = modalWrapper.querySelector(".modal-content");
-        modalContent.classList.add("error-animation");
-        setTimeout(() => {
-            modalContent.classList.remove("error-animation");
-        }, 300);
-    }
+  if (this.getForm().checkValidity()) {
+    this.resolve(this.parseResult());
+    this.removeModal();
+  } else {
+    let modalWrapper = document.querySelector(".modal-wrapper" + this.uuid);
+    let modalContent = modalWrapper.querySelector(".modal-content");
+    modalContent.classList.add("error-animation");
+    setTimeout(() => {
+      modalContent.classList.remove("error-animation");
+    }, 300);
+  }
 };
 
 SmartPrompt.prototype.cancel = function () {
-    this.removeModal();
-    this.reject("Aborted by the user.");
+  this.removeModal();
+  this.reject("Aborted by the user.");
 };
 
 SmartPrompt.prototype.getBoilerPlate = function () {
-    return `<div class="modal-wrapper${this.uuid}">
+  return `<div class="modal-wrapper${this.uuid}">
     <style>
       body {
         overflow: hidden;
