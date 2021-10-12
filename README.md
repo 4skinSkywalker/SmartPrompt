@@ -21,16 +21,30 @@ The promp is able to:
 
 ## Getting started
 
+There are plenty of customizations possible and much more to be implemented in the future!
+It's up to you to submit a feature request.
+
+Look below to see what's available for the moment:
+
 ```js
 let SmartPrompt = require("smartprompt");
 
 let prompt = await new SmartPrompt(
   {
-    figureColor: "#bada55",
-    groundColor: "#fafae9",
+    figureColor: "#bada55", // Optional
+    groundColor: "#fafae9", // Optional
+    textColor: "#111", // Optional
+
+    BGGradientFrom: "#0008", // Optional
+    BGGradientTo: "#fff8", // Optional
+
+    width: "90vw", // Optional
+    maxWidth: "480px", // Optional
+
     title: "This is a title",
-    prescription: "This is the text under the title",
-    postscription: "This is the text at the bottom befor the buttons",
+    prescription: "This is the text under the title", // Optional
+    postscription: "This is the text at the bottom befor the buttons", // Optional
+
     template: `<div style="display: grid; grid-gap: 1rem;">
   <input name="myNumber" type="number" min="0" max="10" placeholder="Age">
   <input name="myText" type="text" minlength="3" maxlength="10" placeholder="Username" required="true">

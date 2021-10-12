@@ -14,6 +14,12 @@ function SmartPrompt(opts = {}) {
   this.groundColor = opts.groundColor || "#fffff1";
   this.textColor = opts.textColor || "#111";
 
+  this.BGGradientFrom = opts.BGGradientFrom || "#0008";
+  this.BGGradientTo = opts.BGGradientTo || "#fff8";
+
+  this.width = opts.width || "90vw";
+  this.maxWidth = opts.maxWidth || "480px";
+
   if (!this.isValidTemplate(this.template)) {
     throw new Error(`Template provided is invalid. The syntax is invalid, or it's a missing a name on an input or required is not specified as required="true"`);
   }
@@ -175,39 +181,34 @@ SmartPrompt.prototype.getBoilerPlate = function () {
         align-items: center;
         color: ${this.textColor};
         background-image: linear-gradient(
-          230deg,
-          #a4c8,
-          #47c8,
-          #4cc8
+          135deg,
+          ${this.BGGradientFrom},
+          ${this.BGGradientTo}
         );
         background-size: 300% 300%;
         opacity: 0;
-        animation: MoveBG 30s ease infinite;
+        animation: MoveBG 30s ease infinite alternate;
         transition: all .3s ease;
       }
   
       @keyframes MoveBG {
-        0% {
-          background-position: 0% 84%;
+        from {
+          background-position: 0% 0%;
         }
-        50% {
-            background-position: 100% 16%;
-        }
-        100% {
-            background-position: 0% 84%;
+        to {
+          background-position: 100% 100%;
         }
       }
   
       .modal-wrapper${this.uuid} .modal-content  {
-        width: 90%;
-        max-width: 600px;
+        width: ${this.width};
+        max-width: ${this.maxWidth};
         max-height: 90vh;
         padding: 1rem;
         overflow: auto;
         background-color: ${this.groundColor};
         border-radius: 1rem;
-        box-shadow:  10px 10px 80px #a4c9,
-                     -10px -10px 80px #4cc9;
+        box-shadow: 0 10px 20px #0006;
         opacity: 0;
         transition: all .3s ease;
       }
