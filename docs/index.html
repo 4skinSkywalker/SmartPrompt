@@ -412,7 +412,9 @@
                 },
             ];
 
-            let optionsMarkup = [...customTokens, ...curatedTokens]
+            let mergedTokens = [...customTokens, ...curatedTokens];
+
+            let optionsMarkup = mergedTokens
                 .map((token, i) => `<div class="option" onclick="prompt${prompt.uuid}.submit(${i})">
     <div class="option-name">
         <img style="display: ${token.thumb ? 'inline-block' : 'none'}" class="option-thumb" src="${token.thumb}" alt="${token.name}"> ${token.name} ${token.symbol.toUpperCase()}
@@ -474,7 +476,7 @@
             });
 
             let index = await prompt.spawn();
-            alert(JSON.stringify(tokens[index], null, 2));
+            alert(JSON.stringify(mergedTokens[index], null, 2));
         };
         // End ethereumTokenSelector
     </script>
