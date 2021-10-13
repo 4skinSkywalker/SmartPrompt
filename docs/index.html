@@ -18,21 +18,42 @@
             height: 100vh;
             font-family: "Inter", sans-serif;
             color: #fffff1;
+            background-color: #333;
+        }
+        button {
+            padding: 1rem;
+            border: 2px solid;
+            border-radius: 1rem;
+            color: #fffff1;
             background-color: #111;
+            cursor: pointer;
+        }
+        .list {
+            margin-bottom: 2rem;
         }
     </style>
 </head>
 <body>
-    <h1>Kind of prompts:</h1>
+
+    <h2>Simple example</h2>
     <div class="list">
-        <button onclick="simple()">Simple</button>
-        <button onclick="advanced()">Advanced</button>
-        <button onclick="extreme()">Extreme</button>
+        <button onclick="oneInputPrompt()">One input prompt</button>
+    </div>
+
+    <h2>Advance example</h2>
+    <div class="list">
+        <button onclick="multipleInputsWithValidationAndCustomColors()" style="color: #111; background-color: #bada55;">Multiple inputs with validation and custom colors</button>
+    </div>
+
+    <h2>Extreme examples</h2>
+    <div class="list">
+        <button onclick="addressBook()" style="color: #FCA; background-color: #023;">Address book</button>
+        <button onclick="ethereumTokenSelector()" style="color: #082032; background-color: #Fb4;">Ethereum token selector</button>
     </div>
 
     <script src="./main.js"></script>
     <script>
-        let simple = async () => {
+        let oneInputPrompt = async () => {
 
             // Get the handle of a SmartPrompt instance
             let prompt = new SmartPrompt();
@@ -50,12 +71,12 @@
             alert("You are " + age + "yo");
         };
 
-        let advanced = async () => {
 
-            // Get the handle of a SmartPrompt instance
+
+        let multipleInputsWithValidationAndCustomColors = async () => {
+
             let prompt = new SmartPrompt();
 
-            // Initialize the prompt
             prompt.init(
                 {
                     figureColor: "#bada55", // Optional
@@ -99,188 +120,363 @@
                 }
             );
 
-            // Spawn and await the prompt
             let obj = await prompt.spawn();
             alert(JSON.stringify(obj, null, 2));
         };
 
-        // Start of extreme example
-        let addNewCustomToken = async () => {
+
+
+        // Start addressBook
+        let LS_ADDRESS_BOOK_KEY = "ADDRESS_BOOK_KEY";
+
+        let getAddresses = () => {
             
-            // Get the handle of a SmartPrompt instance
-            let prompt = new SmartPrompt();
+            let addresses = localStorage.getItem(LS_ADDRESS_BOOK_KEY);
+            if (addresses) {
+                addresses = JSON.parse(addresses);
+            }
+            else {
+                addresses = [];
+            }
+            return addresses;
+        }
 
-            // Initialize the prompt
-            prompt.init(
-                {
-                    figureColor: "cornsilk",
-                    groundColor: "coral",
-                    textColor: "darkslategrey",
-
-                    BGGradientFrom: "#19f8",
-                    BGGradientTo: "#f198",
-
-                    title: "Add a new custom token",
-                    prescription: "Please insert valid address and name",
-                    postscription: "Inputs will be validated with a call to the blockchain",
-
-                    template: `<div style="display: grid; grid-gap: 1rem;">
-    <input name="tokenAddress" autocomplete="off" type="text" minlength="3" maxlength="10" placeholder="Token address" required="true">
-    <input name="tokenName" autocomplete="off" type="text" minlength="3" maxlength="20" placeholder="Token name" required="true">
-</div>`
-                }
-            );
-
-            // Spawn and await the prompt
-            let obj = await prompt.spawn();
-            alert(JSON.stringify(obj, null, 2));
+        let removeAddress = (name) => {
+            
+            let addresses = getAddresses();
+            let foundIndex = addresses.findIndex(addr => addr.name === name);
+            addresses.splice(foundIndex, 1);
+            localStorage.setItem(LS_ADDRESS_BOOK_KEY, JSON.stringify(addresses));
         };
 
-        let extreme = async () => {
-
-            // Get the handle of a SmartPrompt instance
+        let addNewAddress = async (retryMessage) => {
+            
             let prompt = new SmartPrompt();
 
-            // Make some options procedurally
-            let tokenList = [
+            prompt.init({
+                figureColor: "#FCA",
+                groundColor: "#023",
+                textColor: "#FF9",
+
+                BGGradientFrom: "#2228",
+                BGGradientTo: "#DDC8",
+
+                title: "Add new address",
+                prescription: retryMessage,
+                postscription: "Note that the name must be unique",
+
+                template: `<div style="display: grid; grid-gap: 1rem;">
+    <input type="text" autocomplete="off" name="address" required="true" placeholder="Address">
+    <input type="text" autocomplete="off" name="name" required="true" placeholder="Name">
+    <textarea autocomplete="off" name="notes"></textarea>
+</div>`
+            });
+
+            let result;
+            try {
+                result = await prompt.spawn();
+            }
+            catch (err) {
+                addressBook();
+                throw err;
+            }
+
+            let addresses = getAddresses();
+            let found = addresses.find(addr => addr.name === result.name);
+            if (found) {
+                addNewAddress("Was not possible to add the name you've specified because it's already existent")
+            }
+            else {
+                addresses.push(result);
+                localStorage.setItem(LS_ADDRESS_BOOK_KEY, JSON.stringify(addresses));
+                addressBook();
+            }
+        };
+        
+        let addressBook = async () => {
+
+            let prompt = new SmartPrompt();
+
+            let addresses = getAddresses();
+
+            let optionsMarkup = addresses
+                .map((addr, i) => `<div class="option" onclick="prompt${prompt.uuid}.submit('${btoa(JSON.stringify(addr))}')">
+    <div class="option-name">${addr.name}</div>
+    <div class="option-address">${addr.address}</div>
+    <div class="option-notes">${addr.notes}</div>
+    <button onclick="event.stopPropagation(); removeAddress('${addr.name}'); this.parentElement.style.display = 'none';">Remove</button>
+</div>`
+                )
+                .join("");
+
+            prompt.init({
+                excludeConfirmation: true,
+
+                figureColor: "#FCA",
+                groundColor: "#023",
+                textColor: "#FF9",
+
+                BGGradientFrom: "#2228",
+                BGGradientTo: "#DDC8",
+
+                title: "Address book",
+                prescription: "You can add or search a name in your address book",
+                postscription: "This is the end of the list",
+
+                template: `<style>
+    .select {
+        display: grid;
+        grid-gap: 1rem;
+    }
+    .option {
+        display: grid;
+        grid-gap: .25rem;
+        padding: 1rem;
+        border: 2px solid #F0A500;
+        border-radius: 1rem;
+        color: #F0A500;
+        background-color: #082032;
+        cursor: pointer;
+    }
+    .option-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .option-address {
+        word-break: break-all;
+    }
+    .option-notes {
+        font-style: italic;
+    }
+</style>
+<div style="display: grid; grid-gap: 1rem;">
+    <button onclick="prompt${prompt.uuid}.cancel(); addNewAddress();">Add new address</button>
+    <input type="text" name="search" autocomplete="off" placeholder="Seach" oninput="[...document.querySelectorAll('.option-name')].forEach(opt => opt.parentElement.style.display = (opt.innerText.toLowerCase().includes(this.value.toLowerCase())) ? 'grid' : 'none')">
+    <div class="select">
+        ${optionsMarkup}    
+    </div>
+</div>`
+            });
+
+            let result = await prompt.spawn();
+            alert(JSON.stringify(JSON.parse(atob(result)), null, 2));
+        };
+        // End addressBook
+
+
+
+        // Start ethereumTokenSelector
+        let LS_TOKENS_KEY = "TOKENS_KEY";
+
+        let getTokens = () => {
+            
+            let tokens = localStorage.getItem(LS_TOKENS_KEY);
+            if (tokens) {
+                tokens = JSON.parse(tokens);
+            }
+            else {
+                tokens = [];
+            }
+            return tokens;
+        }
+
+        let removeToken = (address) => {
+            
+            let tokens = getTokens();
+            let foundIndex = tokens.findIndex(token => token.address === address);
+            tokens.splice(foundIndex, 1);
+            localStorage.setItem(LS_TOKENS_KEY, JSON.stringify(tokens));
+        };
+
+        let addNewToken = async (retryMessage) => {
+            
+            let prompt = new SmartPrompt();
+
+            prompt.init({
+                figureColor: "#FB4",
+                groundColor: "#FFD",
+                textColor: "#544",
+
+                BGGradientFrom: "#3015",
+                BGGradientTo: "#FFE5",
+
+                title: "Add new token",
+                prescription: retryMessage,
+                postscription: "Note that the address must be unique",
+
+                template: `<div style="display: grid; grid-gap: 1rem;">
+    <input type="text" autocomplete="off" name="address" required="true" placeholder="Address">
+    <input type="text" autocomplete="off" name="name" required="true" placeholder="Name">
+    <input type="text" autocomplete="off" name="symbol" required="true" placeholder="Symbol">
+    <textarea autocomplete="off" name="notes"></textarea>
+</div>`
+            });
+
+            let result;
+            try {
+                result = await prompt.spawn();
+            }
+            catch (err) {
+                ethereumTokenSelector();
+                throw err;
+            }
+
+            let tokens = getTokens();
+            let found = tokens.find(token => token.address === result.address);
+            if (found) {
+                addNewToken("Was not possible to add the token you've specified because it's already existent")
+            }
+            else {
+                result.custom = true;
+                tokens.push(result);
+                localStorage.setItem(LS_TOKENS_KEY, JSON.stringify(tokens));
+                ethereumTokenSelector();
+            }
+        };
+        
+        let ethereumTokenSelector = async () => {
+
+            let prompt = new SmartPrompt();
+
+            let customTokens = getTokens();
+            let curatedTokens = [
                 {
                     name: "Ethereum",
                     symbol: "ETH",
                     thumb: "https://assets.coingecko.com/coins/images/279/thumb/ethereum.png",
                     address: "0x0000000000000000000000000000000000000000",
-                    decimals: "18"
+                    decimals: "18",
                 },
                 {
                     name: "USD Tether",
                     symbol: "usdt",
                     thumb: "https://assets.coingecko.com/coins/images/325/thumb/Tether-logo.png",
                     address: "0xdac17f958d2ee523a2206206994597c13d831ec7",
-                    decimals: "6"
+                    decimals: "6",
                 },
                 {
                     name: "Uniswap",
                     symbol: "uni",
                     thumb: "https://assets.coingecko.com/coins/images/12504/thumb/uniswap-uni.png",
                     address: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-                    decimals: "18"
+                    decimals: "18",
                 },
                 {
                     name: "Chainlink",
                     symbol: "link",
                     thumb: "https://assets.coingecko.com/coins/images/877/thumb/chainlink-new-logo.png",
                     address: "0x514910771af9ca656af840dff83e8264ecf986ca",
-                    decimals: "18"
+                    decimals: "18",
                 },
                 {
                     name: "USD Coin",
                     symbol: "usdc",
                     thumb: "https://assets.coingecko.com/coins/images/6319/thumb/USD_Coin_icon.png",
                     address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-                    decimals: "6"
+                    decimals: "6",
                 },
                 {
                     name: "Wrapped Bitcoin",
                     symbol: "wbtc",
                     thumb: "https://assets.coingecko.com/coins/images/7598/thumb/wrapped_bitcoin_wbtc.png",
                     address: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
-                    decimals: "8"
+                    decimals: "8",
                 },
                 {
                     name: "Binance USD",
                     symbol: "busd",
                     thumb: "https://assets.coingecko.com/coins/images/9576/thumb/BUSD.png",
                     address: "0x4fabb145d64652a948d72533023f6e7a623c7c53",
-                    decimals: "18"
+                    decimals: "18",
                 },
                 {
                     name: "OKB",
                     symbol: "okb",
                     thumb: "https://assets.coingecko.com/coins/images/4463/thumb/okb_token.png",
                     address: "0x75231f58b43240c9718dd58b4967c5114342a86c",
-                    decimals: "18"
+                    decimals: "18",
                 },
                 {
                     name: "Crypto.com Coin",
                     symbol: "cro",
                     thumb: "https://assets.coingecko.com/coins/images/7310/thumb/cypto.png",
                     address: "0xa0b73e1ff0b80914ab6fe0444e65848c4c34450b",
-                    decimals: "8"
-                }
+                    decimals: "8",
+                },
+                {
+                    name: "Aave",
+                    symbol: "aave",
+                    thumb: "https://assets.coingecko.com/coins/images/12645/thumb/AAVE.png",
+                    address: "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
+                    decimals: "18",
+                },
             ];
 
-            // Let's build the markup!
-            let optionsMarkup = tokenList.map((d, i) => {
-                return `<div class="option" onclick="prompt${prompt.uuid}.submit(${i});">
-    <img class="option-img" src="${d.thumb}">
-    <div class="option-title">${d.name}</div>
-    <div class="option-descr">${d.address}</div>
-</div>`;
-            })
-            .join("");
+            let optionsMarkup = [...customTokens, ...curatedTokens]
+                .map((token, i) => `<div class="option" onclick="prompt${prompt.uuid}.submit(${i})">
+    <div class="option-name">
+        <img style="display: ${token.thumb ? 'inline-block' : 'none'}" class="option-thumb" src="${token.thumb}" alt="${token.name}"> ${token.name} ${token.symbol.toUpperCase()}
+    </div>
+    <div class="option-address">${token.address}</div>
+    <div style="display: ${token.notes ? 'block' : 'none'}" class="option-notes">${token.notes}</div>
+    <button style="display: ${token.custom ? 'block' : 'none'}" onclick="event.stopPropagation(); removeToken('${token.address}'); this.parentElement.style.display = 'none';">Remove</button>
+</div>`
+                )
+                .join("");
 
-            // Initialize the prompt
-            prompt.init(
-                {
-                    excludeConfirmation: true,
+            prompt.init({
+                excludeConfirmation: true,
 
-                    figureColor: "coral",
-                    groundColor: "cornsilk",
-                    textColor: "darkslategrey",
+                figureColor: "#FB4",
+                groundColor: "#FFD",
+                textColor: "#544",
 
-                    BGGradientFrom: "#f198",
-                    BGGradientTo: "#19f8",
+                BGGradientFrom: "#3015",
+                BGGradientTo: "#FFE5",
 
-                    title: "Choose one option",
-                    prescription: "Tap on a choice to proceed with a selection",
+                title: "Tokens",
+                prescription: "You can add or search a token by name",
+                postscription: "This is the end of the list",
 
-                    template: `<div style="display: grid; grid-gap: 1rem;">
-    <style>
-        .select {
-            display: grid;
-            grid-gap: .5rem;
-        }
-        .option {
-            display: grid;
-            grid-gap: .5rem;
-            grid-template-areas: "img title"
-                                 "img descr";
-            grid-template-columns: max-content auto;
-            align-items: center;
-            padding: 1rem;
-            border-radius: 1rem;
-            color: #fffff1;
-            background-color: #111;
-            background-image: linear-gradient(135deg, #f758, #ffd8);
-            cursor: pointer;
-        }
-        .option-img {
-            grid-area: img;
-            height: 32px;
-        }
-        .option-title {
-            grid-area: title;
-            font-size: 1.33rem;
-            font-weight: bold;
-        }
-        .option-descr {
-            grid-area: descr;
-            word-break: break-all;
-        }
-    </style>
-    <button type="button" onclick="addNewCustomToken();">Add custom token</button>
-    <input type="text" autocomplete="off" name="search" placeholder="Search" oninput="[...document.querySelectorAll('.option-title')].forEach(opt => { opt.parentElement.style.display = (opt.innerText.toLowerCase().includes(this.value)) ? 'grid' : 'none' });">
-    <div class="select" id="token-list">
-        ${optionsMarkup}
+                template: `<style>
+    .select {
+        display: grid;
+        grid-gap: 1rem;
+    }
+    .option {
+        display: grid;
+        grid-gap: .25rem;
+        padding: 1rem;
+        border: 2px solid #F0A500;
+        border-radius: 1rem;
+        color: #F0A500;
+        background-color: #082032;
+        cursor: pointer;
+    }
+    .option-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .option-address {
+        word-break: break-all;
+    }
+    .option-notes {
+        font-style: italic;
+    }
+</style>
+<div style="display: grid; grid-gap: 1rem;">
+    <button onclick="prompt${prompt.uuid}.cancel(); addNewToken();">Add new token</button>
+    <input type="text" name="search" autocomplete="off" placeholder="Seach" oninput="[...document.querySelectorAll('.option-name')].forEach(opt => opt.parentElement.style.display = (opt.innerText.toLowerCase().includes(this.value.toLowerCase())) ? 'grid' : 'none')">
+    <div class="select">
+        ${optionsMarkup}    
     </div>
 </div>`
-                }
-            );
+            });
 
-            // Spawn and await the prompt
             let index = await prompt.spawn();
-            alert(JSON.stringify(tokenList[index], null, 2));
+            alert(JSON.stringify(tokens[index], null, 2));
         };
-        // End of extreme example
+        // End ethereumTokenSelector
     </script>
 </body>
 </html>

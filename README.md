@@ -15,6 +15,17 @@ The promp is able to:
 - Have overflow scroll if there is too much content
 - Two buttons, one to confirm and on to dismiss
 
+## How it works
+
+The `new SmartPrompt()` you get an object which represents a shell for a spawnable dialog, its styles are encapsulated with a UUID that marks the element that will be inserted at the bottom of the `body` of the page.
+
+The prompt instance is added to the `window` object at `prompt{{this.UUID}}` where this represents an instance of `SmartPrompt`.
+
+All the inputs defined inside the `template` property must have a `name` attribute on them, as they will be put inside an HTML `form`.
+When the prompt is confirmed all the inputs defined in `template` that had a `name` attribute are taken in form of key-value pairs and merged inside an object that gets returned to the consumer of the prompt.
+
+In the beginning there was a check for the validity of the `template` provided, but then I've removed it to let devs use lil HTML tricks in it.
+
 ## Install
 
 `npm i smartprompt`

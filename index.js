@@ -23,11 +23,6 @@ SmartPrompt.prototype.init = function (opts) {
   this.maxWidth = opts.maxWidth || "480px";
 
   this.excludeConfirmation = opts.excludeConfirmation || false;
-
-  if (!this.isValidTemplate(this.template)) {
-    console.error(this.template);
-    throw new Error(`Template provided is invalid. The syntax is invalid, or it's a missing a name on an input or required is not specified as required="true"`);
-  }
 };
 
 SmartPrompt.prototype.spawn = function () {
@@ -84,20 +79,6 @@ SmartPrompt.prototype.removeModal = function () {
   });
 
   delete window["prompt" + this.uuid];
-};
-
-// I check the validity of the HTML provided and if all inputs have a name
-SmartPrompt.prototype.isValidTemplate = function (template) {
-  let doc = document.createElement("DIV");
-  doc.innerHTML = template;
-  if (doc.innerHTML !== template) { // Look strange, huh? Hehe
-    return false;
-  }
-  let inputs = [
-    ...doc.querySelectorAll("input"),
-    ...doc.querySelectorAll("select")
-  ];
-  return inputs.every(input => input.getAttribute("name"));
 };
 
 SmartPrompt.prototype.submit = function (override) {
@@ -173,13 +154,18 @@ SmartPrompt.prototype.getBoilerPlate = function () {
   
       .modal-wrapper${this.uuid} input[type="number"],
       .modal-wrapper${this.uuid} input[type="text"],
-      .modal-wrapper${this.uuid} select {
+      .modal-wrapper${this.uuid} select,
+      .modal-wrapper${this.uuid} textarea {
         width: 100%;
         padding: .5rem;
         border: 2px solid ${this.figureColor};
         border-radius: 1rem;
         color: ${this.textColor};
         background-color: #0000;
+      }
+
+      .modal-wrapper${this.uuid} textarea {
+        resize: vertical;
       }
 
       .modal-wrapper${this.uuid} button {
@@ -198,7 +184,8 @@ SmartPrompt.prototype.getBoilerPlate = function () {
       }
   
       .modal-wrapper${this.uuid} input:invalid,
-      .modal-wrapper${this.uuid} select:invalid {
+      .modal-wrapper${this.uuid} select:invalid,
+      .modal-wrapper${this.uuid} textarea:invalid {
         box-shadow: 0 0 4px 2px orange
       }
   
