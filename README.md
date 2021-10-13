@@ -21,7 +21,7 @@ The promp is able to:
 
 ## Try it
 
-Head over [TODO](TODO) and try the example there.
+Head over [https://4skinskywalker.github.io/SmartPrompt/](https://4skinskywalker.github.io/SmartPrompt/) and try the examples there.
 
 ## Simple example
 
