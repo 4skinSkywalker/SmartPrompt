@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            display: grid;
+            justify-content: center;
+            align-content: center;
+            margin: 0;
+            height: 100vh;
+            font-family: "Inter", sans-serif;
+            color: #fffff1;
+            background-color: #111;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kind of prompts:</h1>
+    <div class="list">
+        <button onclick="simple()">Simple</button>
+        <button onclick="advanced()">Advanced</button>
+        <button onclick="extreme()">Extreme</button>
+    </div>
+
+    <script src="./main.js"></script>
+    <script>
+        let simple = async () => {
+
+            // Get the handle of a SmartPrompt instance
+            let prompt = new SmartPrompt();
+
+            // Initialize the prompt
+            prompt.init(
+                {
+                    title: "Simple prompt",
+                    template: `<div style="margin-bottom: .5rem;">How old are you?</div><input name="age" autocomplete="false" type="number">`
+                }
+            );
+
+            // Spawn and await the prompt
+            let { age } = await prompt.spawn();
+            alert("You are " + age + "yo");
+        };
+
+        let advanced = async () => {
+
+            // Get the handle of a SmartPrompt instance
+            let prompt = new SmartPrompt();
+
+            // Initialize the prompt
+            prompt.init(
+                {
+                    figureColor: "#bada55", // Optional
+                    groundColor: "#fafae9", // Optional
+                    textColor: "#111", // Optional
+
+                    BGGradientFrom: "#0008", // Optional
+                    BGGradientTo: "#fff8", // Optional
+
+                    width: "90vw", // Optional
+                    maxWidth: "480px", // Optional
+
+                    title: "This is a title",
+                    prescription: "This is the text under the title", // Optional
+                    postscription: "This is the text at the bottom before the buttons", // Optional
+
+                    template: `<div style="display: grid; grid-gap: 1rem;">
+    <input name="myNumber" autocomplete="false" type="number" min="0" max="99" placeholder="Age">
+    <input name="myText" autocomplete="false" type="text" minlength="3" maxlength="10" placeholder="Username" required="true">
+    <div>
+        <input name="myCheck" type="checkbox" required="true">
+        <label>Check</label>
+    </div>
+    <div>
+        <input name="myRadio" type="radio" value="0">
+        <label>Radio 1</label>
+    </div>
+    <div>
+        <input name="myRadio" type="radio" value="1">
+        <label>Radio 2</label>
+    </div>
+    <div>
+        <input name="myRadio" type="radio" value="2">
+        <label>Radio 3</label>
+    </div>
+    <select name="mySelect">
+        <option value="0">Default</option>
+        <option value="1">Another option</option>
+    </select>
+</div>`
+                }
+            );
+
+            // Spawn and await the prompt
+            let obj = await prompt.spawn();
+            alert(JSON.stringify(obj, null, 2));
+        };
+
+        // Start of extreme example
+        let addNewCustomToken = async () => {
+            
+            // Get the handle of a SmartPrompt instance
+            let prompt = new SmartPrompt();
+
+            // Initialize the prompt
+            prompt.init(
+                {
+                    figureColor: "cornsilk",
+                    groundColor: "coral",
+                    textColor: "darkslategrey",
+
+                    BGGradientFrom: "#19f8",
+                    BGGradientTo: "#f198",
+
+                    title: "Add a new custom token",
+                    prescription: "Please insert valid address and name",
+                    postscription: "Inputs will be validated with a call to the blockchain",
+
+                    template: `<div style="display: grid; grid-gap: 1rem;">
+    <input name="tokenAddress" autocomplete="off" type="text" minlength="3" maxlength="10" placeholder="Token address" required="true">
+    <input name="tokenName" autocomplete="off" type="text" minlength="3" maxlength="20" placeholder="Token name" required="true">
+</div>`
+                }
+            );
+
+            // Spawn and await the prompt
+            let obj = await prompt.spawn();
+            alert(JSON.stringify(obj, null, 2));
+        };
+
+        let extreme = async () => {
+
+            // Get the handle of a SmartPrompt instance
+            let prompt = new SmartPrompt();
+
+            // Make some options procedurally
+            let tokenList = [
+                {
+                    name: "Ethereum",
+                    symbol: "ETH",
+                    thumb: "https://assets.coingecko.com/coins/images/279/thumb/ethereum.png",
+                    address: "0x0000000000000000000000000000000000000000",
+                    decimals: "18"
+                },
+                {
+                    name: "USD Tether",
+                    symbol: "usdt",
+                    thumb: "https://assets.coingecko.com/coins/images/325/thumb/Tether-logo.png",
+                    address: "0xdac17f958d2ee523a2206206994597c13d831ec7",
+                    decimals: "6"
+                },
+                {
+                    name: "Uniswap",
+                    symbol: "uni",
+                    thumb: "https://assets.coingecko.com/coins/images/12504/thumb/uniswap-uni.png",
+                    address: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+                    decimals: "18"
+                },
+                {
+                    name: "Chainlink",
+                    symbol: "link",
+                    thumb: "https://assets.coingecko.com/coins/images/877/thumb/chainlink-new-logo.png",
+                    address: "0x514910771af9ca656af840dff83e8264ecf986ca",
+                    decimals: "18"
+                },
+                {
+                    name: "USD Coin",
+                    symbol: "usdc",
+                    thumb: "https://assets.coingecko.com/coins/images/6319/thumb/USD_Coin_icon.png",
+                    address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                    decimals: "6"
+                },
+                {
+                    name: "Wrapped Bitcoin",
+                    symbol: "wbtc",
+                    thumb: "https://assets.coingecko.com/coins/images/7598/thumb/wrapped_bitcoin_wbtc.png",
+                    address: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+                    decimals: "8"
+                },
+                {
+                    name: "Binance USD",
+                    symbol: "busd",
+                    thumb: "https://assets.coingecko.com/coins/images/9576/thumb/BUSD.png",
+                    address: "0x4fabb145d64652a948d72533023f6e7a623c7c53",
+                    decimals: "18"
+                },
+                {
+                    name: "OKB",
+                    symbol: "okb",
+                    thumb: "https://assets.coingecko.com/coins/images/4463/thumb/okb_token.png",
+                    address: "0x75231f58b43240c9718dd58b4967c5114342a86c",
+                    decimals: "18"
+                },
+                {
+                    name: "Crypto.com Coin",
+                    symbol: "cro",
+                    thumb: "https://assets.coingecko.com/coins/images/7310/thumb/cypto.png",
+                    address: "0xa0b73e1ff0b80914ab6fe0444e65848c4c34450b",
+                    decimals: "8"
+                }
+            ];
+
+            // Let's build the markup!
+            let optionsMarkup = tokenList.map((d, i) => {
+                return `<div class="option" onclick="prompt${prompt.uuid}.submit(${i});">
+    <img class="option-img" src="${d.thumb}">
+    <div class="option-title">${d.name}</div>
+    <div class="option-descr">${d.address}</div>
+</div>`;
+            })
+            .join("");
+
+            // Initialize the prompt
+            prompt.init(
+                {
+                    excludeConfirmation: true,
+
+                    figureColor: "coral",
+                    groundColor: "cornsilk",
+                    textColor: "darkslategrey",
+
+                    BGGradientFrom: "#f198",
+                    BGGradientTo: "#19f8",
+
+                    title: "Choose one option",
+                    prescription: "Tap on a choice to proceed with a selection",
+
+                    template: `<div style="display: grid; grid-gap: 1rem;">
+    <style>
+        .select {
+            display: grid;
+            grid-gap: .5rem;
+        }
+        .option {
+            display: grid;
+            grid-gap: .5rem;
+            grid-template-areas: "img title"
+                                 "img descr";
+            grid-template-columns: max-content auto;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 1rem;
+            color: #fffff1;
+            background-color: #111;
+            background-image: linear-gradient(135deg, #f758, #ffd8);
+            cursor: pointer;
+        }
+        .option-img {
+            grid-area: img;
+            height: 32px;
+        }
+        .option-title {
+            grid-area: title;
+            font-size: 1.33rem;
+            font-weight: bold;
+        }
+        .option-descr {
+            grid-area: descr;
+            word-break: break-all;
+        }
+    </style>
+    <button type="button" onclick="addNewCustomToken();">Add custom token</button>
+    <input type="text" autocomplete="off" name="search" placeholder="Search" oninput="[...document.querySelectorAll('.option-title')].forEach(opt => { opt.parentElement.style.display = (opt.innerText.toLowerCase().includes(this.value)) ? 'grid' : 'none' });">
+    <div class="select" id="token-list">
+        ${optionsMarkup}
+    </div>
+</div>`
+                }
+            );
+
+            // Spawn and await the prompt
+            let index = await prompt.spawn();
+            alert(JSON.stringify(tokenList[index], null, 2));
+        };
+        // End of extreme example
+    </script>
+</body>
+</html>

@@ -1,6 +1,8 @@
 function SmartPrompt(opts = {}) {
   this.uuid = Math.random().toString(36).slice(2); // Yes, this is a valid UUID...
+}
 
+SmartPrompt.prototype.init = function (opts) {
   this.title = opts.title || "";
   this.prescription = opts.prescription || "";
   this.postscription = opts.postscription || "";
@@ -20,9 +22,15 @@ function SmartPrompt(opts = {}) {
   this.width = opts.width || "90vw";
   this.maxWidth = opts.maxWidth || "480px";
 
+  this.excludeConfirmation = opts.excludeConfirmation || false;
+
   if (!this.isValidTemplate(this.template)) {
+    console.error(this.template);
     throw new Error(`Template provided is invalid. The syntax is invalid, or it's a missing a name on an input or required is not specified as required="true"`);
   }
+};
+
+SmartPrompt.prototype.spawn = function () {
 
   // Return a promise and extract resolve and reject
   return new Promise((res, rej) => {
@@ -47,7 +55,7 @@ function SmartPrompt(opts = {}) {
     this.resolve = res;
     this.reject = rej;
   });
-}
+};
 
 SmartPrompt.prototype.fade = function (value, callback = () => { }) {
   let modalWrapper = document.querySelector(".modal-wrapper" + this.uuid);
@@ -92,7 +100,15 @@ SmartPrompt.prototype.isValidTemplate = function (template) {
   return inputs.every(input => input.getAttribute("name"));
 };
 
-SmartPrompt.prototype.submit = function () {
+SmartPrompt.prototype.submit = function (override) {
+
+  // Override is when you decide to manually handle submission via the template
+  if (override !== undefined) {
+    this.resolve(override);
+    this.removeModal();
+    return;
+  }
+
   if (this.getForm().checkValidity()) {
     this.resolve(this.parseResult());
     this.removeModal();
@@ -162,7 +178,23 @@ SmartPrompt.prototype.getBoilerPlate = function () {
         padding: .5rem;
         border: 2px solid ${this.figureColor};
         border-radius: 1rem;
+        color: ${this.textColor};
         background-color: #0000;
+      }
+
+      .modal-wrapper${this.uuid} button {
+        padding: 1rem;
+        border: 0;
+        border-radius: 1rem;
+        color: ${this.groundColor};
+        background-color: ${this.figureColor};
+        transition: all .3s ease;
+        cursor: pointer;
+      }
+
+      .modal-wrapper${this.uuid} button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px #0002;
       }
   
       .modal-wrapper${this.uuid} input:invalid,
@@ -226,9 +258,6 @@ SmartPrompt.prototype.getBoilerPlate = function () {
       .modal-wrapper${this.uuid} .submit ,
       .modal-wrapper${this.uuid} .cancel {
         width: 100%;
-        padding: 1rem;
-        border-radius: 1rem;
-        transition: all .3s ease;
       }
   
       .modal-wrapper${this.uuid} .submit {
@@ -242,20 +271,14 @@ SmartPrompt.prototype.getBoilerPlate = function () {
         color: ${this.figureColor};
         background-color: ${this.groundColor};
       }
-  
-      .modal-wrapper${this.uuid} .submit:hover,
-      .modal-wrapper${this.uuid} .cancel:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px #0002;
-      }
     </style>
     <div class="modal-content">
-      <form>
+      <form onsubmit="return false;">
         <h3 class="title">${this.title}</h3>
         <div style="margin: 1.5rem 0;">${this.prescription}</div>
         ${this.template}
         <div style="margin: 1.5rem 0;">${this.postscription}</div>
-        <div class="buttons">
+        <div ${this.excludeConfirmation ? 'style="display: none;"' : ''} class="buttons">
           <button type="button" class="submit" onclick="prompt${this.uuid}.submit()">Submit</button>
           <button type="button" class="cancel" onclick="prompt${this.uuid}.cancel()">Cancel</button>
         </div>
