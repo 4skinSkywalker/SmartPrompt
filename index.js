@@ -1,3 +1,13 @@
+let calcTextColor = (hexColor) => {
+  if (hexColor[0] === "#") {
+    hexColor = hexColor.slice(1);
+  }
+  if (hexColor.length === 3) {
+    hexColor = hexColor.split("").join("0") + "0";
+  }
+  return (parseInt(hexColor, 16) > 0xffffff/2) ? "#1f2d3d" : "#fffdfd";
+}
+
 function SmartPrompt(opts = {}) {
   this.uuid = Math.random().toString(36).slice(2); // Yes, this is a valid UUID...
 }
@@ -14,7 +24,14 @@ SmartPrompt.prototype.init = function (opts) {
 
   this.figureColor = opts.figureColor || "#111";
   this.groundColor = opts.groundColor || "#fffff1";
-  this.textColor = opts.textColor || "#111";
+
+  // Calculate the best textColor if 1. not provided 2. groundColor is hex
+  if (!opts.textColor && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6})$/.test(this.groundColor)) {
+    this.textColor = calcTextColor(this.groundColor);
+    console.log(this.textColor);
+  } else {
+    this.textColor = opts.textColor || "#111";
+  }
 
   this.BGGradientFrom = opts.BGGradientFrom || "#0008";
   this.BGGradientTo = opts.BGGradientTo || "#fff8";

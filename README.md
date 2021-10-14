@@ -26,6 +26,10 @@ When the prompt is confirmed all the inputs defined in `template` that had a `na
 
 In the beginning there was a check for the validity of the `template` provided, but then I've removed it to let devs use lil HTML tricks in it.
 
+## Automatic text color
+
+One little cool feature of this library is that if you specify the `groundColor` property as an hex value you will get the best `textColor` automatically by contrast calculation. Still, if you provide `textColor` you won't get this feature but your color of choice instead.
+
 ## Install
 
 `npm i smartprompt`
@@ -70,7 +74,7 @@ prompt.init(
   {
     figureColor: "#bada55", // Optional
     groundColor: "#fafae9", // Optional
-    textColor: "#111", // Optional
+    textColor: "#111", // Optional, if not provided and groundColor is hex, then it's automatically calculated
 
     BGGradientFrom: "#0008", // Optional
     BGGradientTo: "#fff8", // Optional
