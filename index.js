@@ -28,7 +28,6 @@ SmartPrompt.prototype.init = function (opts) {
   // Calculate the best textColor if 1. not provided 2. groundColor is hex
   if (!opts.textColor && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6})$/.test(this.groundColor)) {
     this.textColor = calcTextColor(this.groundColor);
-    console.log(this.textColor);
   } else {
     this.textColor = opts.textColor || "#111";
   }
