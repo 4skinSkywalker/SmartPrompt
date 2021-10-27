@@ -1,6 +1,6 @@
 {
   "name": "smartprompt",
-  "version": "2.2.6",
+  "version": "2.2.7",
   "description": "\"A neat dialog prompter to get inputs from the user\"",
   "main": "index.js",
   "repository": {

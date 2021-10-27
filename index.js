@@ -3,9 +3,16 @@ let calcTextColor = (hexColor) => {
     hexColor = hexColor.slice(1);
   }
   if (hexColor.length === 3) {
-    hexColor = hexColor.split("").join("0") + "0";
+    hexColor = hexColor.
+      split("").
+      map(hex => hex.repeat(2)).
+      join("");
   }
-  return (parseInt(hexColor, 16) > 0xffffff/2) ? "#1f2d3d" : "#fffdfd";
+  let r = parseInt(hexColor.substr(0, 2), 16);
+  let g = parseInt(hexColor.substr(2, 2), 16);
+  let b = parseInt(hexColor.substr(4, 2), 16);
+  let y = r * 0.299 + g * 0.587 + b * 0.114;
+  return (y >= 128) ? "#1f2d3d" : "#fffdfd";
 }
 
 function SmartPrompt(opts = {}) {
